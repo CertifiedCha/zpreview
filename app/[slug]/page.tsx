@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getBoard, getBoardSlugs } from "../../src/content";
-import { PreviewClient } from "../../src/PreviewClient";
+import { PreviewNoSsr } from "../../src/PreviewNoSsr";
 import { themes } from "../../src/theme";
 
 type PageProps = {
@@ -32,7 +32,7 @@ export default async function BoardPage({ params }: PageProps) {
 
   try {
     const board = await getBoard(slug);
-    return <PreviewClient board={board} theme={themes[board.themeId]} />;
+    return <PreviewNoSsr board={board} theme={themes[board.themeId]} />;
   } catch {
     notFound();
   }
