@@ -1,0 +1,36 @@
+{
+  "id": "board-sample",
+  "title": "Sample Lesson",
+  "description": "A minimal static preview route generated from a JSON file.",
+  "themeId": "brilliant-blue",
+  "advancedStyling": false,
+  "currentPageId": "page-intro",
+  "updatedAt": 0,
+  "pages": [
+    {
+      "id": "page-intro",
+      "title": "Introduction",
+      "blocks": [
+        {
+          "id": "title-1",
+          "type": "title",
+          "content": {
+            "title": "Static JSON Preview",
+            "subtitle": "Drop board JSON files into content/boards and rebuild."
+          },
+          "style": {},
+          "settings": {}
+        },
+        {
+          "id": "paragraph-1",
+          "type": "paragraph",
+          "content": {
+            "text": "This page is generated at build time from content/boards/sample-lesson.json. The URL is shareable after deploying the exported site."
+          },
+          "style": {},
+          "settings": {}
+        }
+      ]
+    }
+  ]
+}
