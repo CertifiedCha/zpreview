@@ -1,7 +1,7 @@
 import { ListChecks } from "lucide-react";
 import type { BlockDefinition } from "../../../types";
 import { baseTypographyGroup, containerStyleGroup, iconSize, quizTypographyFields } from "../../shared";
-import { applyQuizVariantDefaults, createQuizBaseBlock, isQuizVariant, type QuizVariant } from "./shared";
+import { createQuizBaseBlock, isQuizVariant } from "./shared";
 import { renderMiniQuiz } from "./previews";
 import { quizFamilyVariants } from "./variants";
 
@@ -23,19 +23,19 @@ export const quizBlock: BlockDefinition = {
         section: "content",
         kind: "select",
         target: "settings",
-        key: "quizVariant",
-        label: "Question type",
-        applyChange: (block, value) => applyQuizVariantDefaults(block, value as QuizVariant),
-        options: [
-          { label: "Multiple choice", value: "multipleChoice" },
-          { label: "Fill in the blank", value: "fillBlank" },
-          { label: "Short answer", value: "shortAnswer" },
-          { label: "Multi-select", value: "multiSelect" },
-          { label: "True / false", value: "trueFalse" },
-          { label: "Matching", value: "matching" },
-        ],
+        key: "quizChoiceVariant",
+        label: "Variant",
+        disabled: (block) => !isQuizVariant(block, ["multipleChoice"]),
+        optionsFor: (block) => isQuizVariant(block, ["multipleChoice"])
+          ? [
+              { label: "Text", value: "text" },
+              { label: "Picture only", value: "image" },
+              { label: "Picture + text", value: "imageText" },
+            ]
+          : [{ label: "Default", value: "text" }],
+        options: [{ label: "Text", value: "text" }],
       },
-      { section: "content", kind: "text", key: "label", label: "Prompt label" },
+      { section: "content", kind: "toggle", target: "settings", key: "showChoiceMarkers", label: "Show ABCD on options", defaultChecked: true, visibleWhen: (block) => isQuizVariant(block, ["multipleChoice"]) },
       { section: "content", kind: "textarea", key: "question", label: "Question", visibleWhen: (block) => !isQuizVariant(block, ["fillBlank"]) },
       { section: "content", kind: "textarea", key: "text", label: "Supporting text / blank sentence", visibleWhen: (block) => isQuizVariant(block, ["multiSelect"]) },
       {
@@ -104,13 +104,12 @@ export const quizBlock: BlockDefinition = {
         target: "settings",
         key: "quizButtonWidth",
         label: "Check button width",
-        visibleWhen: (block) => isQuizVariant(block, ["fillBlank", "shortAnswer", "multiSelect"]),
+        visibleWhen: (block) => isQuizVariant(block, ["fillBlank", "shortAnswer", "multiSelect", "dropdown", "enumeration"]),
         options: [
           { label: "Inline", value: "inline" },
           { label: "Full width", value: "full" },
         ],
       },
-      { section: "layout", kind: "toggle", target: "settings", key: "showPromptLabel", label: "Show prompt label" },
       { section: "layout", kind: "toggle", target: "settings", key: "showExplanationLink", label: "Show explanation link" },
     ],
     feedback: [
@@ -120,6 +119,8 @@ export const quizBlock: BlockDefinition = {
       { section: "feedback", kind: "toggle", target: "settings", key: "retry", label: "Allow retry" },
       { section: "feedback", kind: "toggle", target: "settings", key: "revealAnswer", label: "Reveal answer" },
       { section: "feedback", kind: "toggle", target: "settings", key: "hideNextUntilAnswered", label: "Hide next content until answered" },
+      { section: "feedback", kind: "toggle", target: "settings", key: "enumerationCaseSensitive", label: "Case sensitive answers", visibleWhen: (block) => isQuizVariant(block, ["enumeration"]) },
+      { section: "feedback", kind: "toggle", target: "settings", key: "enumerationSpaceSensitive", label: "Space sensitive answers", visibleWhen: (block) => isQuizVariant(block, ["enumeration"]) },
     ],
     stylePresets: [
       {
@@ -164,6 +165,8 @@ export const quizBlock: BlockDefinition = {
       },
     ],
     contentControls: (block) => {
+      if (isQuizVariant(block, ["dropdown"])) return ["dropdownQuiz"];
+      if (isQuizVariant(block, ["enumeration"])) return ["enumerationQuiz"];
       if (isQuizVariant(block, ["fillBlank"])) return ["fillBlank"];
       if (isQuizVariant(block, ["matching"])) return ["matchingAnswerKey"];
       if (isQuizVariant(block, ["multipleChoice", "multiSelect"])) return ["quizChoices"];

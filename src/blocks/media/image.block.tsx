@@ -23,6 +23,7 @@ export const imageBlock: BlockDefinition = {
     </div>
   ),
   config: {
+    contentControls: () => ["imageUpload"],
     layout: [
       {
         section: "layout",

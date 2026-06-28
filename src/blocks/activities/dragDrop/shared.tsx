@@ -17,7 +17,7 @@ export function defaultDragExtra(variant: DragVariant): Partial<Block> {
       choiceFontColor: "#27272a",
       radius: 14,
     },
-    settings: { dragVariant: variant, quizButtonWidth: "full", retry: true, showPromptLabel: false },
+    settings: { dragVariant: variant, dragVisualVariant: "default", quizButtonWidth: "full", retry: true, ...(variant === "timeline" ? { showTimelineYears: false, answerTimelineDates: false } : {}), ...(variant === "venn" ? { vennCircleCount: "two" as const } : {}) },
   };
 }
 
@@ -30,10 +30,10 @@ export function applyDragVariantDefaults(block: Block, variant: DragVariant): Bl
 
   const starter = {
     buckets: {
-      question: "Sort each item into the correct bucket.",
-      text: "Drag or tap each card into the best category.",
-      answerText: "Bucket A, Bucket B",
-      rows: [["Item 1", "Bucket A"], ["Item 2", "Bucket B"], ["Item 3", "Bucket A"], ["Item 4", "Bucket B"]],
+      question: "Students sort each item into the correct category.",
+      text: "Drag items to a category, or tap an item and then tap a category",
+      answerText: "Category A, Category B",
+      rows: [["Item for category A", "Category A"], ["Item for category B", "Category B"], ["Another category A item", "Category A"], ["Another category B item", "Category B"]],
     },
     pairs: {
       question: "Match each term with its correct description.",
@@ -51,24 +51,24 @@ export function applyDragVariantDefaults(block: Block, variant: DragVariant): Bl
       question: "Arrange the events in chronological order.",
       text: "",
       answerText: "",
-      rows: [["First event"], ["Second event"], ["Third event"], ["Final event"]],
+      rows: [["First event", "Date 1"], ["Second event", "Date 2"], ["Third event", "Date 3"], ["Final event", "Date 4"]],
     },
     equation: {
-      question: "Build the correct expression.",
+      question: "Students arrange these pieces into the correct expression.",
       text: "",
       answerText: "",
-      rows: [["speed"], ["="], ["distance"], ["/"], ["time"]],
+      rows: [["first piece"], ["+"], ["second piece"], ["="], ["answer"]],
     },
     blanks: {
-      question: "Drag words into the correct blanks.",
-      text: "A scalar has ___ only, while a vector has ___ and ___.",
-      answerText: "magnitude, magnitude, direction",
+      question: "Students drag words into the correct blanks.",
+      text: "Add a sentence with a blank like ___ and another blank like ___.",
+      answerText: "first answer, second answer",
       rows: [],
       choices: [
-        { id: "a", text: "magnitude" },
-        { id: "b", text: "direction" },
-        { id: "c", text: "color" },
-        { id: "d", text: "shape" },
+        { id: "a", text: "first answer" },
+        { id: "b", text: "second answer" },
+        { id: "c", text: "extra option" },
+        { id: "d", text: "another option" },
       ],
     },
     venn: {
@@ -84,7 +84,7 @@ export function applyDragVariantDefaults(block: Block, variant: DragVariant): Bl
       rows: [["Root", ""], ["Branch A", "Root"], ["Branch B", "Root"], ["Leaf", "Branch A"]],
     },
     longText: {
-      question: "Arrange the text so it reads clearly.",
+      question: "Arrange the sequence so it reads clearly.",
       text: "",
       answerText: "",
       rows: [["First sentence."], ["Second sentence."], ["Third sentence."], ["Final sentence."]],
@@ -108,9 +108,11 @@ export function applyDragVariantDefaults(block: Block, variant: DragVariant): Bl
 
 export function dragRowSchema(block: Block) {
   if (isDragVariant(block, ["blanks"])) return undefined;
-  if (isDragVariant(block, ["buckets", "venn"])) return { label: "Draggable cards", itemLabel: "Card", fields: ["Card text", "Correct region"], placeholders: ["New card", "Bucket A"] };
+  if (isDragVariant(block, ["venn"])) return { label: "Draggable cards", itemLabel: "Card", fields: ["Card text", "Correct region", "Image source", "Image alt text", "Image width (%)"], placeholders: ["New card", "Only A", "", "", "100"] };
+  if (isDragVariant(block, ["buckets"])) return { label: "Draggable cards", itemLabel: "Card", fields: ["Card text", "Correct region"], placeholders: ["New card", "Bucket A"] };
   if (isDragVariant(block, ["pairs"])) return { label: "Pairs", itemLabel: "Pair", fields: ["Left card", "Right match"], placeholders: ["New term", "New match"] };
   if (isDragVariant(block, ["hierarchy"])) return { label: "Hierarchy nodes", itemLabel: "Node", fields: ["Node", "Correct parent"], placeholders: ["New node", "Parent node"] };
   if (isDragVariant(block, ["diagram"])) return { label: "Diagram labels", itemLabel: "Label", fields: ["Label", "X percent", "Y percent"], placeholders: ["New label", "50", "50"] };
+  if (isDragVariant(block, ["timeline"])) return { label: "Correct order", itemLabel: "Event", fields: ["Event text", "Date"], placeholders: ["New event", "Date"] };
   return { label: "Correct order", itemLabel: "Item", fields: ["Item text"], placeholders: ["New item"] };
 }

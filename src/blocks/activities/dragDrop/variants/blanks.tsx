@@ -6,18 +6,18 @@ export function createDragBlanksBlock() {
   return createDragDropBlock(
     {
       label: "Blank activity",
-      question: "Drag words into the correct blanks.",
-      text: "A scalar has ___ only, while a vector has ___ and ___.",
-      answerText: "magnitude, magnitude, direction",
+      question: "Students drag words into the correct blanks.",
+      text: "Add a sentence with a blank like ___ and another blank like ___.",
+      answerText: "first answer, second answer",
       choices: [
-        { id: "a", text: "magnitude" },
-        { id: "b", text: "direction" },
-        { id: "c", text: "color" },
-        { id: "d", text: "shape" },
+        { id: "a", text: "first answer" },
+        { id: "b", text: "second answer" },
+        { id: "c", text: "extra option" },
+        { id: "d", text: "another option" },
       ],
-      correctExplanation: "Correct. Scalars have magnitude only; vectors also include direction.",
-      incorrectExplanation: "Some blanks need different words.",
-      hint: "Vectors add direction.",
+      correctExplanation: "This message shows when every blank is correct.",
+      incorrectExplanation: "This message shows when some blanks need another try.",
+      hint: "This is a hint that your students see if they place a word incorrectly. You can remove this.",
     },
     "blanks",
   );

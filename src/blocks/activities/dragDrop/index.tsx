@@ -1,7 +1,7 @@
 import { GripVertical } from "lucide-react";
 import type { Block, BlockDefinition, ThemeTokens } from "../../../types";
 import { baseTypographyGroup, buttonTypographyFields, containerStyleGroup, iconSize, quizTypographyFields } from "../../shared";
-import { applyDragVariantDefaults, dragRowSchema, isDragVariant, type DragVariant } from "./shared";
+import { dragRowSchema, isDragVariant } from "./shared";
 import { renderMiniDragBuckets, renderMiniDragDiagram, renderMiniDragPairs, renderMiniDragVenn, renderMiniGenericOrder } from "./previews";
 import { createDragSortBlock, dragDropFamilyVariants } from "./variants";
 
@@ -22,27 +22,21 @@ export const dragDropBlock: BlockDefinition = {
         section: "content",
         kind: "select",
         target: "settings",
-        key: "dragVariant",
-        label: "Activity type",
-        applyChange: (block, value) => applyDragVariantDefaults(block, value as DragVariant),
-        options: [
-          { label: "Drag to sort", value: "sort" },
-          { label: "Drag to buckets", value: "buckets" },
-          { label: "Match pairs", value: "pairs" },
-          { label: "Label diagram", value: "diagram" },
-          { label: "Timeline order", value: "timeline" },
-          { label: "Equation builder", value: "equation" },
-          { label: "Drag to blanks", value: "blanks" },
-          { label: "Venn sort", value: "venn" },
-          { label: "Hierarchy builder", value: "hierarchy" },
-          { label: "Long text builder", value: "longText" },
-        ],
+        key: "dragVisualVariant",
+        label: "Variant",
+        disabled: (block) => !isDragVariant(block, ["timeline", "venn"]),
+        optionsFor: (block) => isDragVariant(block, ["timeline", "venn"])
+          ? [{ label: "Text", value: "default" }, { label: "Picture only", value: "image" }, { label: "Picture + text", value: "imageText" }]
+          : [{ label: "Default", value: "default" }],
+        options: [{ label: "Default", value: "default" }],
       },
-      { section: "content", kind: "text", key: "label", label: "Prompt label" },
+      { section: "content", kind: "select", target: "settings", key: "vennCircleCount", label: "Circles", visibleWhen: (block) => isDragVariant(block, ["venn"]), options: [{ label: "Two circles", value: "two" }, { label: "Three circles", value: "three" }] },
+      { section: "content", kind: "text", key: "vennLabels", label: "Circle labels (comma-separated)", visibleWhen: (block) => isDragVariant(block, ["venn"]) },
+      { section: "content", kind: "toggle", target: "settings", key: "showTimelineYears", label: "Show dates", defaultChecked: false, visibleWhen: (block) => isDragVariant(block, ["timeline"]) },
+      { section: "content", kind: "toggle", target: "settings", key: "answerTimelineDates", label: "Students answer dates", defaultChecked: false, visibleWhen: (block) => isDragVariant(block, ["timeline"]) },
       { section: "content", kind: "textarea", key: "question", label: "Prompt" },
       { section: "content", kind: "textarea", key: "text", label: "Supporting text", visibleWhen: (block) => isDragVariant(block, ["buckets", "diagram", "blanks", "venn"]) },
       { section: "content", kind: "text", key: "answerText", label: "Bucket names / answers (comma-separated)", visibleWhen: (block) => isDragVariant(block, ["buckets", "blanks", "venn"]) },
-      { section: "content", kind: "text", key: "src", label: "Diagram image URL", visibleWhen: (block) => isDragVariant(block, ["diagram"]) },
     ],
     layout: [
       {
@@ -56,7 +50,6 @@ export const dragDropBlock: BlockDefinition = {
           { label: "Full width", value: "full" },
         ],
       },
-      { section: "layout", kind: "toggle", target: "settings", key: "showPromptLabel", label: "Show prompt label" },
     ],
     feedback: [
       { section: "feedback", kind: "textarea", key: "hint", label: "Hint after mistake" },
@@ -85,7 +78,11 @@ export const dragDropBlock: BlockDefinition = {
       },
     ],
     rowSchema: dragRowSchema,
-    contentControls: (block) => (isDragVariant(block, ["blanks"]) ? ["dragBlankChoices"] : ["rows"]),
+    contentControls: (block) => {
+      if (isDragVariant(block, ["blanks"])) return ["dragBlankChoices"];
+      if (isDragVariant(block, ["diagram"])) return [];
+      return ["rows"];
+    },
   },
 };
 

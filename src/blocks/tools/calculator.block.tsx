@@ -17,10 +17,15 @@ export const calculatorBlock: BlockDefinition = {
       { label: "Show Calculator" },
       {
         style: {
+          textAlign: "center",
           buttonFillColor: "#475569",
           buttonFontColor: "#ffffff",
           buttonFontSize: 12,
           shadowColor: "#1f2937",
+        },
+        settings: {
+          customBlockGap: true,
+          customHitboxInset: false,
         },
       },
     ),
@@ -33,6 +38,20 @@ export const calculatorBlock: BlockDefinition = {
   ),
   config: {
     content: [{ section: "content", kind: "text", key: "label", label: "Button label" }],
+    layout: [
+      {
+        section: "layout",
+        kind: "select",
+        target: "style",
+        key: "textAlign",
+        label: "Button alignment",
+        options: [
+          { label: "Left", value: "left" },
+          { label: "Centered", value: "center" },
+          { label: "Right", value: "right" },
+        ],
+      },
+    ],
     styleGroups: [
       {
         title: "Button",

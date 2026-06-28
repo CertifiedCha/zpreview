@@ -5,19 +5,18 @@ import { renderMiniDragBuckets } from "../previews";
 export function createDragBucketsBlock() {
   return createDragDropBlock(
     {
-      label: "Sorting activity",
-      question: "Sort each item into the correct bucket.",
-      text: "Drag or tap each card into the best category.",
-      answerText: "Scalar, Vector",
+      question: "Students sort each item into the correct category.",
+      text: "Drag items to a category, or tap an item and then tap a category",
+      answerText: "Category A, Category B",
       rows: [
-        ["Speed", "Scalar"],
-        ["Mass", "Scalar"],
-        ["Velocity", "Vector"],
-        ["Force", "Vector"],
+        ["Item for category A", "Category A"],
+        ["Item for category B", "Category B"],
+        ["Another category A item", "Category A"],
+        ["Another category B item", "Category B"],
       ],
-      correctExplanation: "Correct. Scalars only need magnitude, while vectors need magnitude and direction.",
-      incorrectExplanation: "Some cards are in the wrong bucket. Check whether each quantity needs a direction.",
-      hint: "Vectors include direction; scalars do not.",
+      correctExplanation: "This message shows when every item is in the right category.",
+      incorrectExplanation: "This message shows when some items are in the wrong category.",
+      hint: "This is a hint that your students see if they sort an item incorrectly. You can remove this.",
     },
     "buckets",
   );
@@ -25,7 +24,7 @@ export function createDragBucketsBlock() {
 
 export const dragBucketsVariant: BlockFamilyVariant = {
   id: "buckets",
-  label: "Drag to buckets",
+  label: "Classify",
   createBlock: createDragBucketsBlock,
   preview: renderMiniDragBuckets,
 };

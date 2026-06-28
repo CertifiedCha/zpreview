@@ -1,8 +1,10 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import type { Block, Board, ThemeTokens } from "./types";
+import { getComposedPage } from "./boardState";
+import { StudentRuntimeProvider, useStudentRuntime } from "./studentRuntime";
 import { StudentBlockContent } from "./components/BlockRenderers";
 
 type PreviewClientProps = {
@@ -10,19 +12,64 @@ type PreviewClientProps = {
   theme: ThemeTokens;
 };
 
+type PreviewStripProperties = CSSProperties & {
+  zoom?: number;
+  "--student-pin-top"?: string;
+};
+
+const COLUMN_WIDTH = 740;
+const COLUMN_GAP = 8;
+
 export function PreviewClient({ board, theme }: PreviewClientProps) {
-  const initialPageIndex = Math.max(0, board.pages.findIndex((page) => page.id === board.currentPageId));
-  const [pageIndex, setPageIndex] = useState(initialPageIndex);
+  return <StudentRuntimeProvider board={board}><PreviewClientContent board={board} theme={theme} /></StudentRuntimeProvider>;
+}
+
+function PreviewClientContent({ board, theme }: PreviewClientProps) {
+  const runtime = useStudentRuntime();
+  const pageIndex = Math.max(0, board.pages.findIndex((page) => page.id === runtime.snapshot.currentPageId));
   const [pageDirection, setPageDirection] = useState(1);
-  const [readyPageId, setReadyPageId] = useState(board.pages[initialPageIndex]?.id ?? "");
-  const [revealed, setRevealed] = useState<Record<string, boolean>>({});
-  const page = board.pages[pageIndex] ?? board.pages[0];
+  const [readyPageId, setReadyPageId] = useState(board.pages[pageIndex]?.id ?? "");
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const [previewZoom, setPreviewZoom] = useState(1);
+  const localPage = board.pages[pageIndex] ?? board.pages[0];
+  const page = getComposedPage(board, localPage);
   const blocksReady = readyPageId === page.id;
+  const multiColumn = page.columns.length > 1;
+  const nativeWidth = page.columns.length * COLUMN_WIDTH + Math.max(0, page.columns.length - 1) * COLUMN_GAP;
+
+  const fitColumns = useCallback(() => {
+    if (!multiColumn) {
+      setPreviewZoom(1);
+      return;
+    }
+    if (window.matchMedia("(max-width: 780px)").matches) {
+      setPreviewZoom(1);
+      return;
+    }
+    const availableWidth = Math.max(1, (viewportRef.current?.clientWidth ?? window.innerWidth) - 32);
+    setPreviewZoom(Math.min(1, availableWidth / nativeWidth));
+  }, [multiColumn, nativeWidth]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setReadyPageId(page.id), 190);
     return () => window.clearTimeout(timer);
   }, [page.id]);
+
+  useLayoutEffect(() => {
+    // Measure before paint so background tabs cannot expose an unfitted strip.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fitColumns();
+    const observer = new ResizeObserver(fitColumns);
+    const portraitQuery = window.matchMedia("(max-width: 780px)");
+    if (viewportRef.current) observer.observe(viewportRef.current);
+    window.addEventListener("resize", fitColumns);
+    portraitQuery.addEventListener("change", fitColumns);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", fitColumns);
+      portraitQuery.removeEventListener("change", fitColumns);
+    };
+  }, [fitColumns, page.id]);
 
   return (
     <div className="student-shell">
@@ -36,30 +83,44 @@ export function PreviewClient({ board, theme }: PreviewClientProps) {
         </span>
       </header>
       <AnimatePresence mode="wait">
-        <motion.main
-          key={page.id}
-          className="student-paper"
-          initial={{ opacity: 0, x: pageDirection * 36 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: pageDirection * -28 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-        >
-          <StudentBlockList
-            blocks={page.blocks}
-            blocksReady={blocksReady}
-            theme={theme}
-            revealed={revealed}
-            onReveal={(id) => setRevealed((current) => ({ ...current, [id]: true }))}
-            onNextPage={() => {
-              setPageDirection(1);
-              setRevealed({});
-              setPageIndex((current) => Math.min(board.pages.length - 1, current + 1));
-            }}
-          />
-        </motion.main>
+        <div ref={viewportRef} className={`student-board-viewport ${multiColumn ? "is-multi" : "is-single"}`}>
+          <motion.main
+            className={`student-board-strip ${multiColumn ? "is-multi" : "is-single"}`}
+            style={multiColumn ? ({ width: `${nativeWidth}px`, zoom: previewZoom, "--student-pin-top": `${64 / previewZoom}px` } as PreviewStripProperties) : undefined}
+            initial={{ opacity: 0, x: pageDirection * 36 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: pageDirection * -28 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          >
+            {page.columns.map((column) => (
+              <section key={column.id} className={`student-paper student-board-column${page.pinnedColumnIds?.includes(column.id) ? " is-pinned" : ""}`}>
+                <StudentBlockList
+                  blocks={column.blocks}
+                  blocksReady={blocksReady}
+                  theme={theme}
+                  revealed={runtime.snapshot.revealed}
+                  onReveal={runtime.revealBlock}
+                  onNextPage={() => {
+                    setPageDirection(1);
+                    collectCalculatorBlockIds(localPage.columns.flatMap((item) => item.blocks)).forEach((blockId) => runtime.setBlockState(blockId, "calculator.open", false, false));
+                    runtime.setCurrentPageId(board.pages[Math.min(board.pages.length - 1, pageIndex + 1)].id);
+                  }}
+                />
+              </section>
+            ))}
+          </motion.main>
+        </div>
       </AnimatePresence>
     </div>
   );
+}
+
+function collectCalculatorBlockIds(blocks: Block[]): string[] {
+  return blocks.flatMap((block) => [
+    ...(block.type === "calculator" ? [block.id] : []),
+    ...collectCalculatorBlockIds(block.children?.left ?? []),
+    ...collectCalculatorBlockIds(block.children?.right ?? []),
+  ]);
 }
 
 function StudentBlockList({

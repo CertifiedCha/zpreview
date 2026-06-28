@@ -1,4 +1,4 @@
-export const MAX_STORED_IMAGE_BYTES = 750 * 1024;
+export const MAX_STORED_IMAGE_BYTES = 2 * 1024 * 1024;
 
 export function canStoreImageFile(file: File) {
   return file.size <= MAX_STORED_IMAGE_BYTES;
@@ -9,7 +9,7 @@ export function canStoreImageBlob(blob: Blob) {
 }
 
 export function formatImageStorageLimit() {
-  return `${Math.round(MAX_STORED_IMAGE_BYTES / 1024)} KB`;
+  return `${MAX_STORED_IMAGE_BYTES / (1024 * 1024)} MB`;
 }
 
 export function showImageStorageLimitAlert() {

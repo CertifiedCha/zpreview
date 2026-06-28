@@ -9,14 +9,14 @@ export function createFillBlankQuizBlock() {
     settings: { ...block.settings, quizVariant: "fillBlank" as const, quizMarker: "letters" as const, quizButtonWidth: "full" as const, fillBlankMode: "drag" as const },
     content: {
       ...block.content,
-      question: "Drag words or tap to place them in the correct blanks.",
-      text: "The chemical formula for water is ___ and carbon dioxide is ___.",
-      answerText: "H2O, CO2",
+      question: "Students drag words or tap choices to fill the blanks.",
+      text: "Add a sentence with a blank like ___ and another blank like ___.",
+      answerText: "first answer, second answer",
       choices: [
-        { id: "a", text: "CO2" },
-        { id: "b", text: "O2" },
-        { id: "c", text: "NaCl" },
-        { id: "d", text: "H2O" },
+        { id: "a", text: "first answer" },
+        { id: "b", text: "second answer" },
+        { id: "c", text: "extra option" },
+        { id: "d", text: "another option" },
       ],
     },
   };

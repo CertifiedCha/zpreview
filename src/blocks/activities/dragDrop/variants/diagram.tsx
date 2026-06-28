@@ -7,17 +7,19 @@ export function createDragDiagramBlock() {
     {
       label: "Diagram labeling",
       question: "Drag each label to the correct part of the diagram.",
-      text: "Use x and y percentages in the row editor to position each target.",
+      text: "Drag each label to its correct target on the image.",
       src: "",
+      diagramImageWidthPercent: 100,
+      diagramImageHeight: 320,
       rows: [
         ["Peak", "50", "18"],
         ["Base", "50", "78"],
         ["Left slope", "24", "52"],
         ["Right slope", "76", "52"],
       ],
-      correctExplanation: "Nice labeling. Each label is attached to the right target.",
-      incorrectExplanation: "Some labels are not on their correct targets yet.",
-      hint: "Place each label on the target that names the visible part.",
+      correctExplanation: "This message shows when every label is on the correct target.",
+      incorrectExplanation: "This message shows when some labels are not on their targets yet.",
+      hint: "This is a hint that your students see if they place a label incorrectly. You can remove this.",
     },
     "diagram",
   );

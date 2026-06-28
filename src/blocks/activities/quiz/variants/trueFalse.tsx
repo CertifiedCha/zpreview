@@ -9,8 +9,8 @@ export function createTrueFalseQuizBlock() {
     settings: { ...block.settings, quizVariant: "trueFalse" as const, quizMarker: "trueFalse" as const, quizChoiceColumns: "two" as const },
     content: {
       ...block.content,
-      question: "A scalar quantity has direction.",
-      correctChoiceId: "false",
+      question: "Students choose whether this statement is true or false.",
+      correctChoiceId: "true",
     },
   };
 }

@@ -9,8 +9,8 @@ export function createShortAnswerQuizBlock() {
     settings: { ...block.settings, quizVariant: "shortAnswer" as const, quizMarker: "letters" as const },
     content: {
       ...block.content,
-      question: "If a vehicle accelerates at 2m/s^2, what speed does it reach in 5s?",
-      answerText: "10",
+      question: "Students type a short answer to this question.",
+      answerText: "Expected answer",
     },
   };
 }

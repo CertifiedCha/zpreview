@@ -10,8 +10,11 @@ export function makeBlock(type: BlockType, content: Block["content"], extra?: Pa
     content,
     style: { shell: "plain", ...(extra?.style ?? {}) },
     settings: { ...(extra?.settings ?? {}) },
+    pinned: false,
     locked: false,
     children: extra?.children,
+    miniPages: extra?.miniPages,
+    activeMiniPageId: extra?.activeMiniPageId,
   };
 }
 
@@ -107,6 +110,20 @@ export const textAlignStylingField: BlockConfigField = {
   target: "style",
   key: "textAlign",
   label: "Text alignment",
+  options: [
+    { label: "Left", value: "left" },
+    { label: "Center", value: "center" },
+    { label: "Right", value: "right" },
+  ],
+};
+
+export const buttonAlignmentLayoutField: BlockConfigField = {
+  section: "layout",
+  kind: "select",
+  target: "style",
+  key: "textAlign",
+  label: "Button alignment",
+  defaultValue: "center",
   options: [
     { label: "Left", value: "left" },
     { label: "Center", value: "center" },

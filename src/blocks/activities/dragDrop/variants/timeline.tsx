@@ -7,10 +7,10 @@ export function createDragTimelineBlock() {
     {
       label: "Timeline activity",
       question: "Arrange the events in chronological order.",
-      rows: [["Question is asked"], ["Evidence is gathered"], ["Claim is tested"], ["Conclusion is shared"]],
-      correctExplanation: "Perfect timeline. The events now follow the correct chronology.",
-      incorrectExplanation: "A few events are out of order. Look for what must happen before the next step.",
-      hint: "Start with the earliest event.",
+      rows: [["First event", "Date 1"], ["Second event", "Date 2"], ["Third event", "Date 3"]],
+      correctExplanation: "This message shows when the timeline is in the correct order.",
+      incorrectExplanation: "This message shows when a few events are out of order.",
+      hint: "This is a hint that your students see if they arrange events incorrectly. You can remove this.",
     },
     "timeline",
   );

@@ -19,7 +19,7 @@ export function renderMiniDragSort(block: Block, theme: ThemeTokens) {
 
 export function renderMiniDragBuckets(block: Block, theme: ThemeTokens) {
   const buckets = parseBucketNames(block);
-  const rows = block.content.rows?.length ? block.content.rows : [["Speed", buckets[0]], ["Force", buckets[1] ?? buckets[0]]];
+  const rows = block.content.rows?.length ? block.content.rows : [["Item A", buckets[0]], ["Item B", buckets[1] ?? buckets[0]]];
   return (
     <div className="source-quiz-preview">
       <p className="mb-3 line-clamp-2 text-[12px] font-black leading-snug text-zinc-950">{block.content.question}</p>

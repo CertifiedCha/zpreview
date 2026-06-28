@@ -5,17 +5,17 @@ import { renderMiniGenericOrder } from "../previews";
 export function createDragLongTextBlock() {
   return createDragDropBlock(
     {
-      label: "Long text builder",
-      question: "Arrange the text so it reads clearly.",
+      label: "Sequencing",
+      question: "Arrange the sequence so it reads clearly.",
       rows: [
         ["First, identify what the problem is asking."],
         ["Next, list the information that is given."],
         ["Then, choose a relationship that connects the information."],
         ["Finally, solve and check whether the answer makes sense."],
       ],
-      correctExplanation: "Correct. The text now flows in a clear order.",
-      incorrectExplanation: "Some parts interrupt the flow.",
-      hint: "Look for transition words like first, next, then, and finally.",
+      correctExplanation: "This message shows when the sequence reads in the correct order.",
+      incorrectExplanation: "This message shows when some parts are out of order.",
+      hint: "This is a hint that your students see if they arrange the sequence incorrectly. You can remove this.",
     },
     "longText",
   );
@@ -23,7 +23,7 @@ export function createDragLongTextBlock() {
 
 export const dragLongTextVariant: BlockFamilyVariant = {
   id: "longText",
-  label: "Long text builder",
+  label: "Sequencing",
   createBlock: createDragLongTextBlock,
   preview: renderMiniGenericOrder,
 };

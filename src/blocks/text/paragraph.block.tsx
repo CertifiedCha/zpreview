@@ -11,7 +11,7 @@ export const paragraphBlock: BlockDefinition = {
     makeBlock("paragraph", {
       text: "Write your paragraph here, explanation, description...",
     }),
-  preview: (block) => <p className="text-[13px] font-medium leading-relaxed text-zinc-600">{block.content.text}</p>,
+  preview: (block) => <p className="text-[13px] font-medium leading-relaxed text-[#0b0b0b]">{block.content.text}</p>,
   config: {
     content: [{ section: "content", kind: "textarea", key: "text", label: "Paragraph text" }],
     stylePresets: defaultStylePresets,
@@ -21,7 +21,7 @@ export const paragraphBlock: BlockDefinition = {
         title: "Body Text",
         description: "Overrides for this paragraph text.",
         defaultOpen: true,
-        fields: [fontSizeField("bodyFontSize", "Paragraph font size", 16, 10, 48), fontColorField("bodyFontColor", "Paragraph font color", "#3f3f46")],
+        fields: [fontSizeField("bodyFontSize", "Paragraph font size", 16, 10, 48), fontColorField("bodyFontColor", "Paragraph font color", "#0b0b0b")],
       },
       containerStyleGroup,
     ],

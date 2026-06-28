@@ -6,11 +6,11 @@ export function createDragEquationBlock() {
   return createDragDropBlock(
     {
       label: "Equation builder",
-      question: "Build the correct expression.",
-      rows: [["speed"], ["="], ["distance"], ["/"], ["time"]],
-      correctExplanation: "Correct. The expression is built in the right order.",
-      incorrectExplanation: "The expression is not ordered correctly yet.",
-      hint: "Place the equals sign after the quantity being solved.",
+      question: "Students arrange these pieces into the correct expression.",
+      rows: [["first piece"], ["+"], ["second piece"], ["="], ["answer"]],
+      correctExplanation: "This message shows when the expression is in the right order.",
+      incorrectExplanation: "This message shows when the expression is not ordered correctly yet.",
+      hint: "This is a hint that your students see if they build the expression incorrectly. You can remove this.",
     },
     "equation",
   );

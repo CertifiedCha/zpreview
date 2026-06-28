@@ -1,3 +1,4 @@
+"use client";
 import katex from "katex";
 import { Fragment, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { cn } from "../theme";

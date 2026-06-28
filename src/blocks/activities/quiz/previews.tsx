@@ -36,7 +36,7 @@ export function renderMiniQuiz(block: Block, theme: ThemeTokens) {
         {miniQuizPanel(
           "Answer",
           <>
-            <p className="mb-2 line-clamp-2 text-[9.5px] font-black leading-snug text-zinc-950">What speed is reached?</p>
+            <p className="mb-2 line-clamp-2 text-[9.5px] font-black leading-snug text-zinc-950">Question text goes here</p>
             <div className="grid grid-cols-[1fr_36px] gap-1">
               <div className="h-8 rounded-xl border border-zinc-200 bg-white" />
               <div className="h-8 rounded-xl" style={{ background: theme.borderLight }} />

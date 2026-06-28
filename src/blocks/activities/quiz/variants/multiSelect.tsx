@@ -9,9 +9,9 @@ export function createMultiSelectQuizBlock() {
     settings: { ...block.settings, quizVariant: "multiSelect" as const, quizMarker: "checkbox" as const, quizChoiceColumns: "one" as const, quizButtonWidth: "full" as const },
     content: {
       ...block.content,
-      question: "Select all vector quantities below:",
+      question: "Students select every correct option.",
       text: "Select all that apply",
-      correctChoiceIds: "a,b,d",
+      correctChoiceIds: "a,c",
     },
   };
 }

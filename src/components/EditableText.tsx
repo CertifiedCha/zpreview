@@ -1,3 +1,4 @@
+"use client";
 import { useCallback, useEffect, useRef, type CSSProperties } from "react";
 import { cn } from "../theme";
 import { canStoreImageFile, showImageStorageLimitAlert } from "../utils/imageStorage";
@@ -11,9 +12,10 @@ type EditableTextProps = {
   style?: CSSProperties;
   multiline?: boolean;
   placeholder?: string;
+  onBlur?: (value: string) => void;
 };
 
-export function EditableText({ value = "", onChange, className, style, multiline, placeholder }: EditableTextProps) {
+export function EditableText({ value = "", onChange, className, style, multiline, placeholder, onBlur }: EditableTextProps) {
   const ref = useRef<HTMLDivElement>(null);
   const selectionSnapshot = useRef<TextSelectionSnapshot | null>(null);
   const commitValue = useCallback(function commitValue(element: HTMLElement) {
@@ -62,7 +64,11 @@ export function EditableText({ value = "", onChange, className, style, multiline
       data-placeholder={placeholder}
       className={cn("editable-text min-w-0 rounded-md outline-none focus:bg-blue-50/70 focus:ring-2 focus:ring-blue-200", className)}
       style={style}
-      onBlur={(event) => commitValue(event.currentTarget)}
+      onBlur={(event) => {
+        const next = serializeRichElement(event.currentTarget);
+        onChange(next);
+        onBlur?.(next);
+      }}
       onFocus={(event) => {
         selectionSnapshot.current = getTextSelectionSnapshot(event.currentTarget);
         window.dispatchEvent(new CustomEvent("editable-text-focus", { detail: { element: event.currentTarget } }));

@@ -53,6 +53,7 @@ export const categoryColors = {
   multimedia: "#0891b2",
   layout: "#9333ea",
   assessment: "#ea580c",
+  gamified: "#7c3aed",
   interaction: "#16a34a",
   tools: "#475569",
 };
