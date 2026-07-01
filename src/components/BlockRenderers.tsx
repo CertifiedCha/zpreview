@@ -16,6 +16,7 @@ import { canStoreImageFile, showImageStorageLimitAlert } from "../utils/imageSto
 import { resolveMiniPageNavigation, useStudentBlockState } from "../studentRuntime";
 import { createMiniPage, miniPageContainerId } from "../boardState";
 import { EditableText } from "./EditableText";
+import { FormulaInput } from "./FormulaInput";
 import { EditorFlashcardBlock, StudentFlashcardBlock } from "./FlashcardBlock";
 import { MathFormula, MathText } from "./MathText";
 import { EditorWhiteboardBlock, StudentWhiteboardBlock } from "./WhiteboardBlock";
@@ -137,7 +138,15 @@ export function EditorBlockContent({ block, theme, updateBlock, commitBlockUpdat
   if (block.type === "equation") {
     return (
       <section className={cn(shellClass(block.style.shell), "equation-block-content py-1", textAlignClass(block, "center"))} style={equationSurfaceStyle(block)}>
-        <MathFormula value={block.content.mathSource} display={block.settings.mathDisplay !== "inline"} className="equation-formula inline-block leading-none" style={blockTextStyle(block)} />
+        <FormulaInput
+          blockId={block.id}
+          value={block.content.mathSource}
+          display={block.settings.mathDisplay !== "inline"}
+          onChange={(mathSource) => updateContent({ mathSource })}
+          className="equation-formula-editor"
+          previewClassName="equation-formula inline-block leading-none"
+          previewStyle={blockTextStyle(block)}
+        />
         {block.settings.showCaption && (
           <EditableText value={block.content.caption} onChange={(caption) => updateContent({ caption })} className="mt-0.5 text-[12px] font-medium leading-tight text-zinc-500" style={partTextStyle(block, "caption")} placeholder="Caption" />
         )}
@@ -378,10 +387,13 @@ export function StudentBlockContent({ block, theme, renderChildren, renderMiniPa
   if (block.type === "callout") {
     return (
       <section className={cn(shellClass(block.style.shell ?? "tinted"), "rounded-2xl border-2 p-5", textAlignClass(block))} style={blockSurfaceStyle(block, { background: theme.bgLight, borderColor: theme.borderLight })}>
-        {hasTitle && (
-          <MathText block text={block.content.title} className="text-[18px] font-bold" style={{ color: block.style.titleFontColor ?? block.style.fontColor ?? theme.primary, fontSize: block.style.titleFontSize ? `${block.style.titleFontSize}px` : scaledFontSize(block, 1.1) }} />
-        )}
-        {hasBodyText && <MathText block text={block.content.text} className={cn("text-[15px] leading-relaxed text-zinc-700", hasTitle && "mt-2")} style={partTextStyle(block, "body")} />}
+        <div className="flex gap-3">
+          <Lightbulb className="mt-1 shrink-0" size={22} style={{ color: theme.primary }} />
+          <div className="min-w-0 flex-1">
+            {(hasTitle || !hasBodyText) && <MathText block text={block.content.title} className="text-[17px] font-bold text-zinc-900" style={partTextStyle(block, "title")} />}
+            {hasBodyText && <MathText block text={block.content.text} className={cn("text-[15px] leading-relaxed text-zinc-700", hasTitle && "mt-2")} style={partTextStyle(block, "body")} />}
+          </div>
+        </div>
       </section>
     );
   }
@@ -1585,11 +1597,11 @@ function HierarchySubtreePreview({ rows, rootIndex, parentFor, anchorWidth }: { 
   return <div className="pointer-events-none" style={{ width: `${anchorWidth}px` }}><div className="relative left-1/2 w-max -translate-x-1/2">{branch(rootIndex, new Set())}</div></div>;
 }
 
-function EditorHierarchyNode({ index, text, block, root, onTextChange }: { index: number; text: string; block: Block; root?: boolean; onTextChange: (text: string) => void }) { const { attributes, listeners, setNodeRef: setDragRef, transform, isDragging } = useDraggable({ id: `hierarchy-node-${index}` }); const { setNodeRef: setDropRef, isOver } = useDroppable({ id: `hierarchy-parent-${index}` }); return <div ref={(node) => { setDragRef(node); setDropRef(node); }} className={cn("relative cursor-grab touch-none active:cursor-grabbing", isDragging && "opacity-0")} style={transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : undefined} {...listeners} {...attributes}><HierarchyNodeShell text={text} over={isOver} root={root}><EditableText value={text} onChange={onTextChange} className={cn("min-w-14 text-center text-sm font-bold", root && "text-white")} style={{ ...partTextStyle(block, "choice"), ...(root ? { color: "#ffffff" } : {}) }} /></HierarchyNodeShell></div>; }
+function EditorHierarchyNode({ index, text, block, root, onTextChange }: { index: number; text: string; block: Block; root?: boolean; onTextChange: (text: string) => void }) { const { attributes, listeners, setNodeRef: setDragRef, transform, isDragging } = useDraggable({ id: `hierarchy-node-${index}` }); const { setNodeRef: setDropRef, isOver } = useDroppable({ id: `hierarchy-parent-${index}` }); return <div ref={(node) => { setDragRef(node); setDropRef(node); }} className={cn("relative cursor-grab touch-none active:cursor-grabbing", isDragging && "opacity-0")} style={transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : undefined} {...listeners} {...attributes}><HierarchyNodeShell text={text} over={isOver} root={root}><EditableText value={text} onChange={onTextChange} multiline className={cn("min-w-14 text-center text-sm font-bold leading-snug", root && "text-white")} style={{ ...partTextStyle(block, "choice"), ...(root ? { color: "#ffffff" } : {}) }} /></HierarchyNodeShell></div>; }
 
 function StudentHierarchyNode({ index, text, root }: { index: number; text: string; root?: boolean }) { const { attributes, listeners, setNodeRef: setDragRef, transform, isDragging } = useDraggable({ id: `hierarchy-node-${index}` }); const { setNodeRef: setDropRef, isOver } = useDroppable({ id: `hierarchy-parent-${index}` }); return <div ref={(node) => { setDragRef(node); setDropRef(node); }} className={cn("touch-none", isDragging && "opacity-0")} style={transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : undefined} {...listeners} {...attributes}><HierarchyNodeShell text={text} over={isOver} root={root} /></div>; }
 
-function HierarchyNodeShell({ text, children, over, active, root }: { text: string; children?: React.ReactNode; over?: boolean; active?: boolean; root?: boolean }) { return <div className={cn("inline-flex min-h-11 items-center justify-center rounded-xl border-2 border-b-[4px] px-4 py-2 text-sm font-bold shadow-sm", root ? "border-zinc-950 border-b-black bg-zinc-800 text-white" : "border-zinc-200 bg-white text-zinc-800", over && "border-blue-500 bg-blue-50 text-zinc-900", active && "scale-105 shadow-xl")}>{children ?? text}</div>; }
+function HierarchyNodeShell({ text, children, over, active, root }: { text: string; children?: React.ReactNode; over?: boolean; active?: boolean; root?: boolean }) { return <div className={cn("inline-flex min-h-11 items-center justify-center rounded-xl border-2 border-b-[4px] px-4 py-2 text-sm font-bold shadow-sm", root ? "border-zinc-950 border-b-black bg-zinc-800 text-white" : "border-zinc-200 bg-white text-zinc-800", over && "border-blue-500 bg-blue-50 text-zinc-900", active && "scale-105 shadow-xl")}>{children ?? <span className="whitespace-pre-wrap text-center leading-snug">{text}</span>}</div>; }
 
 function nextHierarchyNodeName(rows: string[][]) { let number = rows.length + 1; let name = `New node ${number}`; while (rows.some((row) => row[0] === name)) { number += 1; name = `New node ${number}`; } return name; }
 
@@ -3936,7 +3948,7 @@ function DropdownQuizControl({ blank, itemIndex, blankIndex, theme, value, submi
 
   return (
     <>
-      <span className="inline-flex max-w-full align-middle">
+      <span className="inline-flex align-middle">
         <DropdownSelect.Root
           value={value}
           disabled={locked}
@@ -3944,7 +3956,7 @@ function DropdownQuizControl({ blank, itemIndex, blankIndex, theme, value, submi
         >
           <DropdownSelect.Trigger
             aria-label={`Statement ${itemIndex + 1}, dropdown ${blankIndex + 1}`}
-            className={cn("dropdown-quiz-trigger relative mx-1 inline-flex min-h-9 min-w-24 max-w-full items-center justify-center rounded-lg bg-white px-7 align-middle text-center text-[13px] font-semibold leading-5 text-zinc-700 outline-none", correct && "is-correct", wrong && "is-wrong")}
+            className={cn("dropdown-quiz-trigger relative mx-1 inline-flex min-h-9 min-w-24 items-center justify-start whitespace-nowrap rounded-lg bg-white px-7 align-middle text-left text-[13px] font-semibold leading-5 text-zinc-700 outline-none", correct && "is-correct", wrong && "is-wrong")}
             style={controlStyle}
           >
             <DropdownSelect.Value placeholder="Select" />
@@ -3954,7 +3966,7 @@ function DropdownQuizControl({ blank, itemIndex, blankIndex, theme, value, submi
             <DropdownSelect.Content className="dropdown-quiz-menu z-[220] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-xl bg-white shadow-xl" position="popper" sideOffset={6} collisionPadding={12} style={controlStyle}>
               <DropdownSelect.Viewport>
                 {blank.options.map((option) => (
-                  <DropdownSelect.Item key={option.id} value={option.id} className="dropdown-quiz-option relative flex min-h-11 cursor-pointer select-none items-center justify-center px-4 py-2 text-center text-[15px] font-medium text-zinc-700 outline-none data-[highlighted]:bg-[var(--dropdown-accent-light)] data-[highlighted]:text-zinc-950">
+                  <DropdownSelect.Item key={option.id} value={option.id} className="dropdown-quiz-option relative flex min-h-11 cursor-pointer select-none items-center justify-start whitespace-nowrap px-4 py-2 text-left text-[15px] font-medium text-zinc-700 outline-none data-[highlighted]:bg-[var(--dropdown-accent-light)] data-[highlighted]:text-zinc-950">
                     <DropdownSelect.ItemText>{option.text || "Untitled option"}</DropdownSelect.ItemText>
                   </DropdownSelect.Item>
                 ))}
